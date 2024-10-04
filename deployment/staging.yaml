@@ -1,0 +1,49 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: cpm-notification-svc
+  labels:
+    app: cpm-notification-service
+spec:
+  ports:
+  - port: 80
+    targetPort: 9004
+    name: backend
+  selector:
+    app: cpm-notification-service
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpm-notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cpm-notification-service
+  template:
+    metadata:
+      labels:
+        app: cpm-notification-service
+    spec:
+      containers:
+      - name: notification-service
+        image: praisindo.azurecr.io/cpm/notification-service:__imageTag__
+        ports:
+        - containerPort: 9004
+        env:
+          - name: APP_ENV
+            value: "staging"
+          - name: DB_PROVIDER
+            value: "sql"
+          - name: DB_CONNECTION
+            value: "postgres"
+          - name: DB_PREFIX
+            value: "pigeon_"
+          - name: USE_REPLICA
+            value: "false"
+      imagePullSecrets:
+        - name: my-azure-key
+---
