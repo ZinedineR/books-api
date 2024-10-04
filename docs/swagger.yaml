@@ -1,0 +1,622 @@
+basePath: /
+definitions:
+  books-api_internal_delivery_http_response.DataResponse:
+    properties:
+      data: {}
+      responseCode:
+        type: integer
+      responseMessage: {}
+    type: object
+  books-api_internal_delivery_http_response.PaginationResponse:
+    properties:
+      data: {}
+      pagination: {}
+      responseCode:
+        type: integer
+      responseMessage: {}
+    type: object
+  books-api_internal_delivery_http_response.SuccessResponse:
+    properties:
+      responseCode:
+        type: integer
+      responseMessage: {}
+    type: object
+  books-api_internal_entity.Author:
+    properties:
+      birthdate:
+        example: "1896-09-24"
+        type: string
+      id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      name:
+        example: F. Scott Fitzgerald
+        type: string
+    required:
+    - id
+    - name
+    type: object
+  books-api_internal_entity.Book:
+    properties:
+      author:
+        allOf:
+        - $ref: '#/definitions/books-api_internal_entity.Author'
+        description: Foreign key association with author
+      author_id:
+        example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        type: string
+      id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      isbn:
+        example: 978-3-16-148410-0
+        type: string
+      title:
+        example: The Great Gatsby
+        type: string
+    type: object
+  books-api_internal_entity.UpsertAuthor:
+    properties:
+      birthdate:
+        example: "1899-07-21"
+        type: string
+      name:
+        example: Ernest Hemingway
+        minLength: 2
+        type: string
+    required:
+    - name
+    type: object
+  books-api_internal_entity.UpsertBook:
+    properties:
+      author_id:
+        example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        type: string
+      isbn:
+        example: 978-3-16-148410-0
+        minLength: 2
+        type: string
+      title:
+        example: The Great Gatsby
+        minLength: 2
+        type: string
+    required:
+    - author_id
+    - isbn
+    - title
+    type: object
+  books-api_internal_entity.UserLogin:
+    properties:
+      password:
+        description: '"password" custom validation assumed'
+        example: SecurePass123!
+        type: string
+      username:
+        example: john_doe
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  books-api_internal_model.Pagination:
+    properties:
+      limit:
+        description: The size of the page
+        example: 10
+        type: integer
+      page:
+        description: The current page
+        example: 1
+        type: integer
+      total_pages:
+        description: The total number of pages
+        example: 5
+        type: integer
+      total_row_per_page:
+        description: The total number of data per page
+        example: 10
+        type: integer
+      total_rows:
+        description: The total number of data
+        example: 50
+        type: integer
+    type: object
+  books-api_internal_services.UserLoginResponse:
+    properties:
+      token:
+        description: JWT token example
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+        type: string
+      username:
+        example: john_doe
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:9004
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server celler server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Books-API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates the user and returns an access token
+      parameters:
+      - description: Login Request
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/books-api_internal_entity.UserLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/books-api_internal_services.UserLoginResponse'
+              type: object
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+      summary: User login
+      tags:
+      - Users
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user with the provided username and password
+      parameters:
+      - description: Registration Request
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/books-api_internal_entity.UserLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/books-api_internal_entity.UserLogin'
+              type: object
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+      summary: Register a new user
+      tags:
+      - Users
+  /authors:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a paginated list of authors with optional ordering and
+        filtering
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: "0"
+        description: Number of items per page
+        in: query
+        name: pageSize
+        type: string
+      - default: "0"
+        description: Page number
+        in: query
+        name: page
+        type: string
+      - default: id:1:eq
+        description: Filter rules<br><br>### Rules Filter<br>rule:<br>  * {Name of
+          Field}:{value}:{Symbol}<br><br>Symbols:<br>  * eq (=)<br>  * lt (<)<br>  *
+          gt (>)<br>  * lte (<=)<br>  * gte (>=)<br>  * in (in)<br>  * like (like)<br><br>Field
+          list:<br>  * id<br>  * name<br>  * birthdate
+        in: query
+        name: filter
+        type: string
+      - default: id:desc
+        description: Sort rules:<br><br>### Rules Sort<br>rule:<br>  * {Name of Field}:{Symbol}<br><br>Symbols:<br>  *
+          asc<br>  * desc<br><br>Field list:<br>  * id<br>  * name<br>  * birthdate
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/books-api_internal_delivery_http_response.PaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/books-api_internal_entity.Author'
+                  type: array
+                pagination:
+                  $ref: '#/definitions/books-api_internal_model.Pagination'
+              type: object
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: List authors
+      tags:
+      - Authors
+    post:
+      consumes:
+      - application/json
+      description: Creates a new author with the provided details
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Author Request
+        in: body
+        name: author
+        required: true
+        schema:
+          $ref: '#/definitions/books-api_internal_entity.UpsertAuthor'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/books-api_internal_entity.UpsertAuthor'
+              type: object
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new author
+      tags:
+      - Authors
+  /authors/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing author by ID
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Author ID (UUID format)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.SuccessResponse'
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.SuccessResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete an existing author
+      tags:
+      - Authors
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the details of a specific author by ID
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Author ID (UUID format)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/books-api_internal_entity.Author'
+              type: object
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get details of an author
+      tags:
+      - Authors
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing author with the provided details
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Author ID (UUID format)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated Author details
+        in: body
+        name: author
+        required: true
+        schema:
+          $ref: '#/definitions/books-api_internal_entity.UpsertAuthor'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/books-api_internal_entity.UpsertAuthor'
+              type: object
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update an existing author
+      tags:
+      - Authors
+  /books:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a paginated list of books with optional ordering and
+        filtering
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - default: "0"
+        description: Number of items per page
+        in: query
+        name: pageSize
+        type: string
+      - default: "0"
+        description: Page number
+        in: query
+        name: page
+        type: string
+      - default: id:1:eq
+        description: Filter rules<br><br>### Rules Filter<br>rule:<br>  * {Name of
+          Field}:{value}:{Symbol}<br><br>Symbols:<br>  * eq (=)<br>  * lt (<)<br>  *
+          gt (>)<br>  * lte (<=)<br>  * gte (>=)<br>  * in (in)<br>  * like (like)<br><br>Field
+          list:<br>  * id<br>  * title<br>  * isbn<br>  * author_id
+        in: query
+        name: filter
+        type: string
+      - default: id:desc
+        description: Sort rules:<br><br>### Rules Sort<br>rule:<br>  * {Name of Field}:{Symbol}<br><br>Symbols:<br>  *
+          asc<br>  * desc<br><br>Field list:<br>  * id<br>  * title<br>  * isbn<br>  *
+          author_id
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/books-api_internal_delivery_http_response.PaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/books-api_internal_entity.Book'
+                  type: array
+                pagination:
+                  $ref: '#/definitions/books-api_internal_model.Pagination'
+              type: object
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+      summary: List books
+      tags:
+      - Books
+    post:
+      consumes:
+      - application/json
+      description: Creates a new book with the provided details
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Book Request
+        in: body
+        name: notification-list
+        required: true
+        schema:
+          $ref: '#/definitions/books-api_internal_entity.UpsertBook'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/books-api_internal_entity.UpsertBook'
+              type: object
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new book
+      tags:
+      - Books
+  /books/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing book by ID
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Book ID (UUID format)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.SuccessResponse'
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.SuccessResponse'
+      summary: Delete an existing book
+      tags:
+      - Books
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the details of a specific book by ID
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Book ID (UUID format)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/books-api_internal_entity.Book'
+              type: object
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+      summary: Get details of a book
+      tags:
+      - Books
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing book with the provided details
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Book ID (UUID format)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated Book details
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/books-api_internal_entity.UpsertBook'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/books-api_internal_entity.UpsertBook'
+              type: object
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+      summary: Update an existing book
+      tags:
+      - Books
+swagger: "2.0"

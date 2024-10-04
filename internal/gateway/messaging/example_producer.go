@@ -1,7 +1,7 @@
 package messaging
 
 import (
-	"boiler-plate-clean/internal/model"
+	"books-api/internal/model"
 	"context"
 )
 

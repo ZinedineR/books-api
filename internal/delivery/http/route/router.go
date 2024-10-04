@@ -1,28 +1,43 @@
 package route
 
 import (
-	"boiler-plate-clean/internal/delivery/http"
+	"books-api/internal/delivery/http"
+	api "books-api/internal/delivery/http/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 type Router struct {
 	App            *gin.Engine
-	ExampleHandler *http.ExampleHTTPHandler
+	BookHandler    *http.BookHTTPHandler
+	AuthorHandler  *http.AuthorHTTPHandler
+	UserHandler    *http.UserHTTPHandler
+	AuthMiddleware *api.AuthMiddleware
 }
 
 func (h *Router) Setup() {
-	api := h.App.Group("")
+	guestApi := h.App.Group("/auth")
 	{
-
-		//Example Routes
-		campaignApi := api.Group("/campaign")
-		//campaignApi.Use(h.RequestMiddleware.RequestHeader)
+		guestApi.POST("/register", h.UserHandler.Register)
+		guestApi.POST("/login", h.UserHandler.Login)
+	}
+	userApi := h.App.Group("")
+	userApi.Use(h.AuthMiddleware.JWTAuthentication)
+	{
+		booksApi := userApi.Group("/books")
 		{
-			campaignApi.POST("/", h.ExampleHandler.Create)
-			campaignApi.GET("/select", h.ExampleHandler.Find)
-			campaignApi.GET("/:id", h.ExampleHandler.FindOne)
-			campaignApi.PUT("/:id", h.ExampleHandler.Update)
-			campaignApi.DELETE("/:id", h.ExampleHandler.Delete)
+			booksApi.POST("", h.BookHandler.Create)
+			booksApi.GET("", h.BookHandler.List)
+			booksApi.GET("/:id", h.BookHandler.FindOne)
+			booksApi.PUT("/:id", h.BookHandler.Update)
+			booksApi.DELETE("/:id", h.BookHandler.Delete)
+		}
+		authorApi := userApi.Group("/authors")
+		{
+			authorApi.POST("", h.AuthorHandler.Create)
+			authorApi.GET("", h.AuthorHandler.List)
+			authorApi.GET("/:id", h.AuthorHandler.FindOne)
+			authorApi.PUT("/:id", h.AuthorHandler.Update)
+			authorApi.DELETE("/:id", h.AuthorHandler.Delete)
 		}
 	}
 }

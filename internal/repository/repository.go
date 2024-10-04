@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"boiler-plate-clean/internal/model"
-	"boiler-plate-clean/pkg/pagination"
+	"books-api/internal/model"
+	"books-api/pkg/pagination"
 	"context"
 	"errors"
 	"log/slog"

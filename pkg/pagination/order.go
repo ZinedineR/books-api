@@ -1,7 +1,7 @@
 package pagination
 
 import (
-	"boiler-plate-clean/internal/model"
+	"books-api/internal/model"
 	"fmt"
 
 	"gorm.io/gorm"

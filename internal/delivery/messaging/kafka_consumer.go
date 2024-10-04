@@ -1,8 +1,8 @@
 package messaging
 
 import (
+	kafkaserver "books-api/pkg/broker/kafkaservice"
 	"context"
-	kafkaserver "github.com/RumbiaID/pkg-library/app/pkg/broker/kafkaservice"
 	"github.com/segmentio/kafka-go"
 	"log/slog"
 )

@@ -1,10 +1,10 @@
 package http
 
 import (
-	"boiler-plate-clean/internal/delivery/http/response"
-	"boiler-plate-clean/internal/model"
+	"books-api/internal/delivery/http/response"
+	"books-api/internal/model"
+	"books-api/pkg/exception"
 	"fmt"
-	"github.com/RumbiaID/pkg-library/app/pkg/exception"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"regexp"

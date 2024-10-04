@@ -1,0 +1,955 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a sample server celler server.",
+        "title": "Books-API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:9004",
+    "basePath": "/",
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "description": "Authenticates the user and returns an access token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "User login",
+                "parameters": [
+                    {
+                        "description": "Login Request",
+                        "name": "login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_entity.UserLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/books-api_internal_services.UserLoginResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "description": "Registers a new user with the provided username and password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "Registration Request",
+                        "name": "register",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_entity.UserLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/books-api_internal_entity.UserLogin"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/authors": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieves a paginated list of authors with optional ordering and filtering",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authors"
+                ],
+                "summary": "List authors",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "0",
+                        "description": "Number of items per page",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "0",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "id:1:eq",
+                        "description": "Filter rules\u003cbr\u003e\u003cbr\u003e### Rules Filter\u003cbr\u003erule:\u003cbr\u003e  * {Name of Field}:{value}:{Symbol}\u003cbr\u003e\u003cbr\u003eSymbols:\u003cbr\u003e  * eq (=)\u003cbr\u003e  * lt (\u003c)\u003cbr\u003e  * gt (\u003e)\u003cbr\u003e  * lte (\u003c=)\u003cbr\u003e  * gte (\u003e=)\u003cbr\u003e  * in (in)\u003cbr\u003e  * like (like)\u003cbr\u003e\u003cbr\u003eField list:\u003cbr\u003e  * id\u003cbr\u003e  * name\u003cbr\u003e  * birthdate",
+                        "name": "filter",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "id:desc",
+                        "description": "Sort rules:\u003cbr\u003e\u003cbr\u003e### Rules Sort\u003cbr\u003erule:\u003cbr\u003e  * {Name of Field}:{Symbol}\u003cbr\u003e\u003cbr\u003eSymbols:\u003cbr\u003e  * asc\u003cbr\u003e  * desc\u003cbr\u003e\u003cbr\u003eField list:\u003cbr\u003e  * id\u003cbr\u003e  * name\u003cbr\u003e  * birthdate",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/books-api_internal_delivery_http_response.PaginationResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/books-api_internal_entity.Author"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "$ref": "#/definitions/books-api_internal_model.Pagination"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new author with the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authors"
+                ],
+                "summary": "Create a new author",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Author Request",
+                        "name": "author",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_entity.UpsertAuthor"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/books-api_internal_entity.UpsertAuthor"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/authors/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieves the details of a specific author by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authors"
+                ],
+                "summary": "Get details of an author",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Author ID (UUID format)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/books-api_internal_entity.Author"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates an existing author with the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authors"
+                ],
+                "summary": "Update an existing author",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Author ID (UUID format)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Author details",
+                        "name": "author",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_entity.UpsertAuthor"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/books-api_internal_entity.UpsertAuthor"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Deletes an existing author by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authors"
+                ],
+                "summary": "Delete an existing author",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Author ID (UUID format)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/books": {
+            "get": {
+                "description": "Retrieves a paginated list of books with optional ordering and filtering",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Books"
+                ],
+                "summary": "List books",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "0",
+                        "description": "Number of items per page",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "0",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "id:1:eq",
+                        "description": "Filter rules\u003cbr\u003e\u003cbr\u003e### Rules Filter\u003cbr\u003erule:\u003cbr\u003e  * {Name of Field}:{value}:{Symbol}\u003cbr\u003e\u003cbr\u003eSymbols:\u003cbr\u003e  * eq (=)\u003cbr\u003e  * lt (\u003c)\u003cbr\u003e  * gt (\u003e)\u003cbr\u003e  * lte (\u003c=)\u003cbr\u003e  * gte (\u003e=)\u003cbr\u003e  * in (in)\u003cbr\u003e  * like (like)\u003cbr\u003e\u003cbr\u003eField list:\u003cbr\u003e  * id\u003cbr\u003e  * title\u003cbr\u003e  * isbn\u003cbr\u003e  * author_id",
+                        "name": "filter",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "id:desc",
+                        "description": "Sort rules:\u003cbr\u003e\u003cbr\u003e### Rules Sort\u003cbr\u003erule:\u003cbr\u003e  * {Name of Field}:{Symbol}\u003cbr\u003e\u003cbr\u003eSymbols:\u003cbr\u003e  * asc\u003cbr\u003e  * desc\u003cbr\u003e\u003cbr\u003eField list:\u003cbr\u003e  * id\u003cbr\u003e  * title\u003cbr\u003e  * isbn\u003cbr\u003e  * author_id",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/books-api_internal_delivery_http_response.PaginationResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/books-api_internal_entity.Book"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "$ref": "#/definitions/books-api_internal_model.Pagination"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new book with the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Create a new book",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Book Request",
+                        "name": "notification-list",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_entity.UpsertBook"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/books-api_internal_entity.UpsertBook"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/books/{id}": {
+            "get": {
+                "description": "Retrieves the details of a specific book by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Get details of a book",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Book ID (UUID format)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/books-api_internal_entity.Book"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates an existing book with the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Update an existing book",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Book ID (UUID format)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Book details",
+                        "name": "book",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_entity.UpsertBook"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/books-api_internal_entity.UpsertBook"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an existing book by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Delete an existing book",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Book ID (UUID format)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "books-api_internal_delivery_http_response.DataResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "responseCode": {
+                    "type": "integer"
+                },
+                "responseMessage": {}
+            }
+        },
+        "books-api_internal_delivery_http_response.PaginationResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "pagination": {},
+                "responseCode": {
+                    "type": "integer"
+                },
+                "responseMessage": {}
+            }
+        },
+        "books-api_internal_delivery_http_response.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "responseCode": {
+                    "type": "integer"
+                },
+                "responseMessage": {}
+            }
+        },
+        "books-api_internal_entity.Author": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "birthdate": {
+                    "type": "string",
+                    "example": "1896-09-24"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "F. Scott Fitzgerald"
+                }
+            }
+        },
+        "books-api_internal_entity.Book": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "description": "Foreign key association with author",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/books-api_internal_entity.Author"
+                        }
+                    ]
+                },
+                "author_id": {
+                    "type": "string",
+                    "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "isbn": {
+                    "type": "string",
+                    "example": "978-3-16-148410-0"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "The Great Gatsby"
+                }
+            }
+        },
+        "books-api_internal_entity.UpsertAuthor": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "birthdate": {
+                    "type": "string",
+                    "example": "1899-07-21"
+                },
+                "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "example": "Ernest Hemingway"
+                }
+            }
+        },
+        "books-api_internal_entity.UpsertBook": {
+            "type": "object",
+            "required": [
+                "author_id",
+                "isbn",
+                "title"
+            ],
+            "properties": {
+                "author_id": {
+                    "type": "string",
+                    "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                },
+                "isbn": {
+                    "type": "string",
+                    "minLength": 2,
+                    "example": "978-3-16-148410-0"
+                },
+                "title": {
+                    "type": "string",
+                    "minLength": 2,
+                    "example": "The Great Gatsby"
+                }
+            }
+        },
+        "books-api_internal_entity.UserLogin": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "description": "\"password\" custom validation assumed",
+                    "type": "string",
+                    "example": "SecurePass123!"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "john_doe"
+                }
+            }
+        },
+        "books-api_internal_model.Pagination": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "description": "The size of the page",
+                    "type": "integer",
+                    "example": 10
+                },
+                "page": {
+                    "description": "The current page",
+                    "type": "integer",
+                    "example": 1
+                },
+                "total_pages": {
+                    "description": "The total number of pages",
+                    "type": "integer",
+                    "example": 5
+                },
+                "total_row_per_page": {
+                    "description": "The total number of data per page",
+                    "type": "integer",
+                    "example": 10
+                },
+                "total_rows": {
+                    "description": "The total number of data",
+                    "type": "integer",
+                    "example": 50
+                }
+            }
+        },
+        "books-api_internal_services.UserLoginResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "description": "JWT token example",
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "john_doe"
+                }
+            }
+        }
+    },
+    "externalDocs": {
+        "description": "OpenAPI",
+        "url": "https://swagger.io/resources/open-api/"
+    }
+}

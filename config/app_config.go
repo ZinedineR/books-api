@@ -13,7 +13,6 @@ type AppConfig struct {
 	AllowOrigins []string `name:"HTTP_ALLOW_ORIGINS"`
 	AllowMethods []string `name:"HTTP_ALLOW_METHODS"`
 	AllowHeaders []string `name:"HTTP_ALLOW_HEADERS"`
-	UseReplica   bool     `validate:"boolean" name:"USE_REPLICA"`
 	LogFilePath  string   `validate:"required" name:"LOG_PATH"`
 }
 
@@ -24,7 +23,6 @@ func AppConfigInit() *AppConfig {
 		AppVersion:   viper.GetString("APP_VERSION"),
 		AppName:      viper.GetString("APP_NAME"),
 		HttpPort:     viper.GetString("HTTP_PORT"),
-		UseReplica:   viper.GetBool("USE_REPLICA"),
 		LogFilePath:  viper.GetString("LOG_PATH"),
 		AllowOrigins: viper.GetStringSlice("ALLOW_ORIGINS"),
 		AllowMethods: viper.GetStringSlice("ALLOW_METHODS"),

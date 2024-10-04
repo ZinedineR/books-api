@@ -1,13 +1,15 @@
 package migration
 
 import (
-	"boiler-plate-clean/internal/entity"
-	"github.com/RumbiaID/pkg-library/app/pkg/database"
+	"books-api/internal/entity"
+	"books-api/pkg/database"
 )
 
 func AutoMigration(CpmDB *database.Database) {
 	CpmDB.MigrateDB(
 
-		&entity.Example{})
+		&entity.User{},
+		&entity.Author{},
+		&entity.Book{})
 	//&entity.SMSLog{}
 }

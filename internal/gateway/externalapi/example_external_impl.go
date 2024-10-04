@@ -1,9 +1,9 @@
 package externalapi
 
 import (
-	"boiler-plate-clean/config"
+	"books-api/config"
+	"books-api/pkg/httpclient"
 	"encoding/base64"
-	"github.com/RumbiaID/pkg-library/app/pkg/httpclient"
 )
 
 type ExampleExternalImpl struct {

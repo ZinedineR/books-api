@@ -1,8 +1,8 @@
 package messaging
 
 import (
-	"boiler-plate-clean/internal/model"
-	kafkaserver "github.com/RumbiaID/pkg-library/app/pkg/broker/kafkaservice"
+	"books-api/internal/model"
+	kafkaserver "books-api/pkg/broker/kafkaservice"
 )
 
 type ExampleProducerImpl struct {
