@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/glebarez/sqlite"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlserver"
@@ -49,6 +50,8 @@ func NewDatabase(driver string, cfg *Config) *Database {
 	case "oracle":
 		slog.Warn("oracle driver is not supported yet")
 		os.Exit(1)
+	case "sqlite":
+		dialect = sqlite.Open("file::memory:?cache=shared")
 	default:
 		slog.Warn("unknown database driver")
 		os.Exit(1)
