@@ -53,6 +53,9 @@ func (s *AuthorServiceImpl) Update(
 ) *exception.Exception {
 	tx := s.db.Begin()
 	defer tx.Rollback()
+	if errs := s.validate.Struct(model); errs != nil {
+		return exception.InvalidArgument(errs)
+	}
 	body := &entity.Author{Id: id}
 	body.GenerateModel(model)
 	if err := s.authorRepo.UpdateTx(ctx, tx, body); err != nil {

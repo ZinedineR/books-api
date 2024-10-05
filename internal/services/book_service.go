@@ -53,6 +53,9 @@ func (s *BookServiceImpl) Update(
 ) *exception.Exception {
 	tx := s.db.Begin()
 	defer tx.Rollback()
+	if errs := s.validate.Struct(model); errs != nil {
+		return exception.InvalidArgument(errs)
+	}
 	body := &entity.Book{Id: id}
 	body.GenerateModel(model)
 	if err := s.bookRepo.UpdateTx(ctx, tx, body); err != nil {
