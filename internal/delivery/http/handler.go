@@ -4,8 +4,12 @@ import (
 	"books-api/internal/delivery/http/response"
 	"books-api/internal/model"
 	"books-api/pkg/exception"
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -69,6 +73,10 @@ func (h *Handler) JSON(e *gin.Context, r response.IResponse) {
 func (h *Handler) AbortJSON(e *gin.Context, r response.IResponse) {
 	e.AbortWithStatusJSON(r.GetStatusCode(), r)
 }
+func (h *Handler) InternalErrorJSON(e *gin.Context, msg any, err ...any) {
+	h.ErrorJSON(e, 500, msg, err)
+}
+
 func (h *Handler) PaginationJSON(c *gin.Context, pagination any, data any) {
 	h.JSON(c, &response.PaginationResponse{
 		ResponseCode:    http.StatusOK,
@@ -127,12 +135,98 @@ func (h *Handler) UnauthorizedJSON(e *gin.Context, msg any, err ...any) {
 	h.ErrorJSON(e, 401, msg, err)
 }
 
+func (h *Handler) SignatureJSON(c *gin.Context, signature string) {
+	h.JSON(c, &response.DataResponse{
+		ResponseCode:    http.StatusOK,
+		ResponseMessage: "success",
+		Data:            &model.Signature{Signature: signature},
+	})
+}
+
 func (h *Handler) ParamInt(e *gin.Context, key string) (int, error) {
 	return strconv.Atoi(e.Param(key))
 }
 
 func (h *Handler) ParamInt64(e *gin.Context, key string) (int64, error) {
 	return strconv.ParseInt(e.Param(key), 10, 64)
+}
+
+func (h *Handler) ParseHTTPMethod(c *gin.Context) (string, string, error) {
+	httpMethod := c.GetHeader("httpMethod")
+
+	// Validate HTTP method
+	if httpMethod != http.MethodPost && httpMethod != http.MethodGet &&
+		httpMethod != http.MethodPut && httpMethod != http.MethodDelete {
+		return "", "", errors.New("http method invalid")
+	}
+
+	// Read the request body
+	bodyJson, errRead := io.ReadAll(c.Request.Body)
+	if errRead != nil {
+		return "", "", errRead
+	}
+
+	// Check if the body is non-empty and valid JSON
+	if len(bodyJson) != 0 {
+		var x interface{}
+		if err := json.Unmarshal(bodyJson, &x); err != nil {
+			return "", "", errors.New("body is not valid JSON")
+		}
+	}
+
+	// Return the HTTP method and body (as []byte)
+	return httpMethod, string(bodyJson), nil
+}
+
+//	func (h *Handler) ParseSignatureHTTPMethod(c *gin.Context) (string, string, error) {
+//		httpMethod := c.Request.Method
+//
+//		// Read the request body
+//		//bodyJson, errRead := io.ReadAll(c.Request.Body)
+//		//if errRead != nil {
+//		//	return "", "", errRead
+//		//}
+//		//
+//		//// Check if the body is non-empty and valid JSON
+//		//if len(bodyJson) != 0 {
+//		//	var x interface{}
+//		//	if err := json.Unmarshal(bodyJson, &x); err != nil {
+//		//		return "", "", errors.New("body is not valid JSON")
+//		//	}
+//		//}
+//		var bodyBytes []byte
+//		if c.Request.Body != nil {
+//			bodyBytes, _ = io.ReadAll(c.Request.Body)
+//		}
+//		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+//
+//		if (c.Request.Method == "POST" || c.Request.Method == "PUT") && len(bodyBytes) == 0 {
+//			return "", "", errors.New("body is required")
+//		}
+//		// Return the HTTP method and body (as []byte)
+//		return httpMethod, string(bodyBytes), nil
+//	}
+func (h *Handler) ParseSignatureHTTPMethod(c *gin.Context) (string, string, error) {
+	httpMethod := c.Request.Method
+
+	// Read the request body
+	bodyBytes, errRead := io.ReadAll(c.Request.Body)
+	if errRead != nil {
+		return "", "", errRead
+	}
+
+	// Restore the body so it can be read again later
+	c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	if (c.Request.Method == "POST" || c.Request.Method == "PUT") && len(bodyBytes) == 0 {
+		return "", "", errors.New("body is required")
+	}
+
+	// Return the HTTP method and body (as string)
+	return httpMethod, string(bodyBytes), nil
+}
+func (h *Handler) GetToken(c *gin.Context) string {
+	return c.GetString("access_token")
 }
 
 func (h *Handler) ParseNameParam(c *gin.Context) (string, string) {

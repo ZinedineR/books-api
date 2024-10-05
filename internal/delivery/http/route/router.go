@@ -7,21 +7,28 @@ import (
 )
 
 type Router struct {
-	App            *gin.Engine
-	BookHandler    *http.BookHTTPHandler
-	AuthorHandler  *http.AuthorHTTPHandler
-	UserHandler    *http.UserHTTPHandler
-	AuthMiddleware *api.AuthMiddleware
+	App              *gin.Engine
+	BookHandler      *http.BookHTTPHandler
+	AuthorHandler    *http.AuthorHTTPHandler
+	UserHandler      *http.UserHTTPHandler
+	SignatureHandler *http.SignatureHTTPHandler
+	AuthMiddleware   *api.AuthMiddleware
 }
 
 func (h *Router) Setup() {
+	h.App.Use(h.AuthMiddleware.ErrorHandler)
 	guestApi := h.App.Group("/auth")
 	{
 		guestApi.POST("/register", h.UserHandler.Register)
 		guestApi.POST("/login", h.UserHandler.Login)
 	}
+	signatureAPI := h.App.Group("/auth/signature")
+	signatureAPI.Use(h.AuthMiddleware.JWTAuthentication)
+	{
+		signatureAPI.POST("", h.SignatureHandler.Signature)
+	}
 	userApi := h.App.Group("")
-	userApi.Use(h.AuthMiddleware.JWTAuthentication)
+	userApi.Use(h.AuthMiddleware.JWTAuthentication, h.AuthMiddleware.SignatureAuthentication)
 	{
 		booksApi := userApi.Group("/books")
 		{

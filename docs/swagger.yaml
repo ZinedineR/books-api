@@ -65,6 +65,7 @@ definitions:
         minLength: 2
         type: string
     required:
+    - birthdate
     - name
     type: object
   books-api_internal_entity.UpsertBook:
@@ -90,6 +91,7 @@ definitions:
       password:
         description: '"password" custom validation assumed'
         example: SecurePass123!
+        minLength: 8
         type: string
       username:
         example: john_doe
@@ -120,6 +122,12 @@ definitions:
         description: The total number of data
         example: 50
         type: integer
+    type: object
+  books-api_internal_model.Signature:
+    properties:
+      signature:
+        example: asdkjhad7asjkdhb#%4jzhnjkfx8@
+        type: string
     type: object
   books-api_internal_services.UserLoginResponse:
     properties:
@@ -210,6 +218,46 @@ paths:
       summary: Register a new user
       tags:
       - Users
+  /auth/signature:
+    post:
+      consumes:
+      - application/json
+      description: Generate Signature to authenticate api request
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: HTTP Method
+        in: header
+        name: httpMethod
+        required: true
+        type: string
+      - description: Optional JSON body
+        in: body
+        name: body
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/books-api_internal_model.Signature'
+              type: object
+        "400":
+          description: error
+          schema:
+            $ref: '#/definitions/books-api_internal_delivery_http_response.DataResponse'
+      summary: Signature API Request
+      tags:
+      - Signatures
   /authors:
     get:
       consumes:
@@ -220,6 +268,11 @@ paths:
       - description: Authorization
         in: header
         name: Authorization
+        required: true
+        type: string
+      - description: generated from signature
+        in: header
+        name: X-Req-Signature
         required: true
         type: string
       - default: "0"
@@ -281,6 +334,11 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: generated from signature
+        in: header
+        name: X-Req-Signature
+        required: true
+        type: string
       - description: Author Request
         in: body
         name: author
@@ -319,6 +377,11 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: generated from signature
+        in: header
+        name: X-Req-Signature
+        required: true
+        type: string
       - description: Author ID (UUID format)
         in: path
         name: id
@@ -348,6 +411,11 @@ paths:
       - description: Authorization
         in: header
         name: Authorization
+        required: true
+        type: string
+      - description: generated from signature
+        in: header
+        name: X-Req-Signature
         required: true
         type: string
       - description: Author ID (UUID format)
@@ -384,6 +452,11 @@ paths:
       - description: Authorization
         in: header
         name: Authorization
+        required: true
+        type: string
+      - description: generated from signature
+        in: header
+        name: X-Req-Signature
         required: true
         type: string
       - description: Author ID (UUID format)
@@ -428,6 +501,11 @@ paths:
       - description: Authorization
         in: header
         name: Authorization
+        required: true
+        type: string
+      - description: generated from signature
+        in: header
+        name: X-Req-Signature
         required: true
         type: string
       - default: "0"
@@ -488,6 +566,11 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: generated from signature
+        in: header
+        name: X-Req-Signature
+        required: true
+        type: string
       - description: Book Request
         in: body
         name: notification-list
@@ -526,6 +609,11 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: generated from signature
+        in: header
+        name: X-Req-Signature
+        required: true
+        type: string
       - description: Book ID (UUID format)
         in: path
         name: id
@@ -553,6 +641,11 @@ paths:
       - description: Authorization
         in: header
         name: Authorization
+        required: true
+        type: string
+      - description: generated from signature
+        in: header
+        name: X-Req-Signature
         required: true
         type: string
       - description: Book ID (UUID format)
@@ -587,6 +680,11 @@ paths:
       - description: Authorization
         in: header
         name: Authorization
+        required: true
+        type: string
+      - description: generated from signature
+        in: header
+        name: X-Req-Signature
         required: true
         type: string
       - description: Book ID (UUID format)

@@ -58,7 +58,7 @@ func main() {
 		AllowHeaders: conf.AppEnvConfig.AllowHeaders,
 	})
 	// external
-	signaturer := signature.NewSignature(conf.AuthConfig.JwtSecretAccessToken)
+	signaturer := signature.NewSignature(conf.AuthConfig.JwtSecretAccessToken, conf.AuthConfig.HMACSecretAccessToken)
 	// repository
 	booksRepository := repository.NewBookSQLRepository()
 	authorRepository := repository.NewAuthorSQLRepository()
@@ -70,16 +70,18 @@ func main() {
 	userService := services.NewUserService(sqlClientRepo.GetDB(), userRepository, signaturer, validate)
 	// Handler
 	authMiddleware := api.NewAuthMiddleware(signaturer)
+	signatureHandler := http.NewSignatureHTTPHandler(signaturer)
 	booksHandler := http.NewBookHTTPHandler(booksService)
 	authorHandler := http.NewAuthorHTTPHandler(authorService)
 	userHandler := http.NewUserHTTPHandler(userService)
 
 	router := route.Router{
-		App:            ginServer.App,
-		BookHandler:    booksHandler,
-		AuthorHandler:  authorHandler,
-		UserHandler:    userHandler,
-		AuthMiddleware: authMiddleware,
+		App:              ginServer.App,
+		BookHandler:      booksHandler,
+		AuthorHandler:    authorHandler,
+		UserHandler:      userHandler,
+		AuthMiddleware:   authMiddleware,
+		SignatureHandler: signatureHandler,
 	}
 	router.Setup()
 	router.SwaggerRouter()

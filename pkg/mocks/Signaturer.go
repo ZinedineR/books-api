@@ -121,6 +121,64 @@ func (_m *Signaturer) JWTCheck(token string) (*signature.JwtAuthenticationRes, *
 	return r0, r1
 }
 
+// SignHMAC512 provides a mock function with given fields: httpMethod, bodyJson, token
+func (_m *Signaturer) SignHMAC512(httpMethod string, bodyJson string, token string) (string, error) {
+	ret := _m.Called(httpMethod, bodyJson, token)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SignHMAC512")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string, string) (string, error)); ok {
+		return rf(httpMethod, bodyJson, token)
+	}
+	if rf, ok := ret.Get(0).(func(string, string, string) string); ok {
+		r0 = rf(httpMethod, bodyJson, token)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(string, string, string) error); ok {
+		r1 = rf(httpMethod, bodyJson, token)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// VerifyHMAC512 provides a mock function with given fields: httpMethod, bodyJson, token, hash
+func (_m *Signaturer) VerifyHMAC512(httpMethod string, bodyJson string, token string, hash string) (bool, *exception.Exception) {
+	ret := _m.Called(httpMethod, bodyJson, token, hash)
+
+	if len(ret) == 0 {
+		panic("no return value specified for VerifyHMAC512")
+	}
+
+	var r0 bool
+	var r1 *exception.Exception
+	if rf, ok := ret.Get(0).(func(string, string, string, string) (bool, *exception.Exception)); ok {
+		return rf(httpMethod, bodyJson, token, hash)
+	}
+	if rf, ok := ret.Get(0).(func(string, string, string, string) bool); ok {
+		r0 = rf(httpMethod, bodyJson, token, hash)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(string, string, string, string) *exception.Exception); ok {
+		r1 = rf(httpMethod, bodyJson, token, hash)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*exception.Exception)
+		}
+	}
+
+	return r0, r1
+}
+
 // NewSignaturer creates a new instance of Signaturer. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewSignaturer(t interface {

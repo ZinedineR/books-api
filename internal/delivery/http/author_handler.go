@@ -27,6 +27,7 @@ func NewAuthorHTTPHandler(author service.AuthorService) *AuthorHTTPHandler {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param Authorization header string true "Authorization"
+// @Param X-Req-Signature header string true "generated from signature"
 // @Param author body entity.UpsertAuthor true "Author Request"
 // @Success 200 {object} response.DataResponse{data=entity.UpsertAuthor} "success"
 // @Failure 400 {object} response.DataResponse "error"
@@ -53,6 +54,7 @@ func (h AuthorHTTPHandler) Create(ctx *gin.Context) {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param Authorization header string true "Authorization"
+// @Param X-Req-Signature header string true "generated from signature"
 // @Param pageSize query string false "Number of items per page" default(0)
 // @Param page query string false "Page number" default(0)
 // @Param filter query string false "Filter rules<br><br>### Rules Filter<br>rule:<br>  * {Name of Field}:{value}:{Symbol}<br><br>Symbols:<br>  * eq (=)<br>  * lt (<)<br>  * gt (>)<br>  * lte (<=)<br>  * gte (>=)<br>  * in (in)<br>  * like (like)<br><br>Field list:<br>  * id<br>  * name<br>  * birthdate" default(id:1:eq)
@@ -85,6 +87,7 @@ func (h AuthorHTTPHandler) List(ctx *gin.Context) {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param Authorization header string true "Authorization"
+// @Param X-Req-Signature header string true "generated from signature"
 // @Param id path string true "Author ID (UUID format)"
 // @Success 200 {object} response.DataResponse{data=entity.Author} "success"
 // @Failure 400 {object} response.DataResponse "error"
@@ -108,6 +111,7 @@ func (h AuthorHTTPHandler) FindOne(ctx *gin.Context) {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param Authorization header string true "Authorization"
+// @Param X-Req-Signature header string true "generated from signature"
 // @Param id path string true "Author ID (UUID format)"
 // @Param author body entity.UpsertAuthor true "Updated Author details"
 // @Success 200 {object} response.DataResponse{data=entity.UpsertAuthor} "success"
@@ -138,6 +142,7 @@ func (h AuthorHTTPHandler) Update(ctx *gin.Context) {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param Authorization header string true "Authorization"
+// @Param X-Req-Signature header string true "generated from signature"
 // @Param id path string true "Author ID (UUID format)"
 // @Success 200 {object} response.SuccessResponse "success"
 // @Failure 400 {object} response.SuccessResponse "error"
