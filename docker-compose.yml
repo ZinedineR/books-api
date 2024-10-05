@@ -14,6 +14,7 @@ services:
       APP_VERSION: "v1"
       HTTP_PORT: "9004"
       JWT_SECRET_ACCESS_TOKEN: "wkhB8NarrReKujasQzlRaOQGOO4S1G884ol9SIyQ7Fr4zxLBJI9Ezml4DeaisAss"
+      HMAC_SECRET_ACCESS_TOKEN: "HmacSHA512"
       DB_CONNECTION: "sqlite"
       DB_PREFIX: "goodreads_"
       ALLOW_ORIGINS: "*"
