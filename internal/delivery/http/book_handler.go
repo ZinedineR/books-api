@@ -27,6 +27,7 @@ func NewBookHTTPHandler(book service.BookService) *BookHTTPHandler {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param Authorization header string true "Authorization"
+// @Param X-Req-Signature header string true "generated from signature"
 // @Param notification-list body entity.UpsertBook true "Book Request"
 // @Success 200 {object} response.DataResponse{data=entity.UpsertBook} "success"
 // @Failure 400 {object} response.DataResponse "error"
@@ -52,6 +53,7 @@ func (h BookHTTPHandler) Create(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Authorization"
+// @Param X-Req-Signature header string true "generated from signature"
 // @Param pageSize query string false "Number of items per page" default(0)
 // @Param page query string false "Page number" default(0)
 // @Param filter query string false "Filter rules<br><br>### Rules Filter<br>rule:<br>  * {Name of Field}:{value}:{Symbol}<br><br>Symbols:<br>  * eq (=)<br>  * lt (<)<br>  * gt (>)<br>  * lte (<=)<br>  * gte (>=)<br>  * in (in)<br>  * like (like)<br><br>Field list:<br>  * id<br>  * title<br>  * isbn<br>  * author_id" default(id:1:eq)
@@ -83,6 +85,7 @@ func (h BookHTTPHandler) List(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Authorization"
+// @Param X-Req-Signature header string true "generated from signature"
 // @Param id path string true "Book ID (UUID format)"
 // @Success 200 {object} response.DataResponse{data=entity.Book} "success"
 // @Failure 400 {object} response.DataResponse "error"
@@ -105,6 +108,7 @@ func (h BookHTTPHandler) FindOne(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Authorization"
+// @Param X-Req-Signature header string true "generated from signature"
 // @Param id path string true "Book ID (UUID format)"
 // @Param book body entity.UpsertBook true "Updated Book details"
 // @Success 200 {object} response.DataResponse{data=entity.UpsertBook} "success"
@@ -134,6 +138,7 @@ func (h BookHTTPHandler) Update(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Authorization"
+// @Param X-Req-Signature header string true "generated from signature"
 // @Param id path string true "Book ID (UUID format)"
 // @Success 200 {object} response.SuccessResponse "success"
 // @Failure 400 {object} response.SuccessResponse "error"

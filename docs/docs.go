@@ -128,6 +128,71 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/signature": {
+            "post": {
+                "description": "Generate Signature to authenticate api request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Signatures"
+                ],
+                "summary": "Signature API Request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "HTTP Method",
+                        "name": "httpMethod",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Optional JSON body",
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/books-api_internal_model.Signature"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/books-api_internal_delivery_http_response.DataResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/authors": {
             "get": {
                 "security": [
@@ -151,6 +216,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Authorization",
                         "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "generated from signature",
+                        "name": "X-Req-Signature",
                         "in": "header",
                         "required": true
                     },
@@ -242,6 +314,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "type": "string",
+                        "description": "generated from signature",
+                        "name": "X-Req-Signature",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Author Request",
                         "name": "author",
                         "in": "body",
@@ -307,6 +386,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "generated from signature",
+                        "name": "X-Req-Signature",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Author ID (UUID format)",
                         "name": "id",
                         "in": "path",
@@ -362,6 +448,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Authorization",
                         "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "generated from signature",
+                        "name": "X-Req-Signature",
                         "in": "header",
                         "required": true
                     },
@@ -436,6 +529,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "generated from signature",
+                        "name": "X-Req-Signature",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Author ID (UUID format)",
                         "name": "id",
                         "in": "path",
@@ -476,6 +576,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Authorization",
                         "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "generated from signature",
+                        "name": "X-Req-Signature",
                         "in": "header",
                         "required": true
                     },
@@ -567,6 +674,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "type": "string",
+                        "description": "generated from signature",
+                        "name": "X-Req-Signature",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Book Request",
                         "name": "notification-list",
                         "in": "body",
@@ -627,6 +741,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "generated from signature",
+                        "name": "X-Req-Signature",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Book ID (UUID format)",
                         "name": "id",
                         "in": "path",
@@ -677,6 +798,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Authorization",
                         "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "generated from signature",
+                        "name": "X-Req-Signature",
                         "in": "header",
                         "required": true
                     },
@@ -741,6 +869,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Authorization",
                         "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "generated from signature",
+                        "name": "X-Req-Signature",
                         "in": "header",
                         "required": true
                     },
@@ -853,6 +988,7 @@ const docTemplate = `{
         "books-api_internal_entity.UpsertAuthor": {
             "type": "object",
             "required": [
+                "birthdate",
                 "name"
             ],
             "properties": {
@@ -901,6 +1037,7 @@ const docTemplate = `{
                 "password": {
                     "description": "\"password\" custom validation assumed",
                     "type": "string",
+                    "minLength": 8,
                     "example": "SecurePass123!"
                 },
                 "username": {
@@ -936,6 +1073,15 @@ const docTemplate = `{
                     "description": "The total number of data",
                     "type": "integer",
                     "example": 50
+                }
+            }
+        },
+        "books-api_internal_model.Signature": {
+            "type": "object",
+            "properties": {
+                "signature": {
+                    "type": "string",
+                    "example": "asdkjhad7asjkdhb#%4jzhnjkfx8@"
                 }
             }
         },
